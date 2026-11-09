@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import { FiSave, FiX } from "react-icons/fi";
 import type {Certificate, CertificateStatus} from "../entities/certificate/model/type";
 import {updateCertificate} from "../entities/certificate/api/certificate.api";
@@ -23,6 +23,7 @@ const statusLabels: Record<
     CertificateStatus,
     string
 > = {
+    waiting_issue_date: "Диплом не выдан",
     pending_contact: "Ожидает связи",
     contacted: "Связались",
     waiting_delivery: "Подготовка к отправке",
@@ -39,17 +40,8 @@ export const EditCertificateModal: React.FC<Props> = ({
     const [editableCert, setEditableCert] =
         useState<Certificate>(certificate);
 
-    useEffect(() => {
-        console.log(certificate)
-    }, [certificate]);
-
     const saveCertificate = async () => {
-        const updated = await updateCertificate(
-            certificate.id,
-            editableCert
-        );
-
-        console.log(editableCert)
+        await updateCertificate(certificate.id, editableCert);
 
         onUpdated();
         onClose();
@@ -172,6 +164,26 @@ export const EditCertificateModal: React.FC<Props> = ({
                                     ...editableCert,
                                     tracking_number:
                                     e.target.value,
+                                })
+                            }
+                            className="w-full border px-3 py-2 rounded-lg"
+                        />
+                    </div>
+
+                    {/* Дата выдачи */}
+                    <div className="space-y-1">
+                        <label htmlFor="certificate-issued-at" className="text-sm text-gray-600">
+                            Дата выдачи
+                        </label>
+
+                        <input
+                            id="certificate-issued-at"
+                            type="date"
+                            value={editableCert.issued_at?.slice(0, 10) || ""}
+                            onChange={(e) =>
+                                setEditableCert({
+                                    ...editableCert,
+                                    issued_at: e.target.value || null,
                                 })
                             }
                             className="w-full border px-3 py-2 rounded-lg"
